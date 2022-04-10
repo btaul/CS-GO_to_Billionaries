@@ -10,11 +10,11 @@ connection = pymysql.connect(
      user='admin',
      password='CS4400GP9',
      port=3306,
-     database='CSGOSTAT'
+     database='CSGO2M'
 )
-#test connection
+# test connection
 cursor = connection.cursor()
-query = "SELECT * from ban"
+query = "SELECT team_name from teams"
 cursor.execute(query)
 data = cursor.fetchone()
 print(data)
