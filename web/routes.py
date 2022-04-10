@@ -22,7 +22,7 @@ def team():
         try:
             cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team1name.data))
             team1 = cursor.fetchone()
-            team1= team1[0]
+            team1id= team1[0]
 
             
         except:
@@ -31,13 +31,13 @@ def team():
         try:
             cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team2name.data))
             team2 = cursor.fetchone()
-            team2= team2[0]
+            team2id= team2[0]
             
             
         except:
             flash('invalid team2 name!', 'error')
 
-        if team1 != team2:
+        if team1id != team2id:
             pass
         else:
             flash('team names can\'t be same', 'warning')
