@@ -9,6 +9,14 @@
             <div>
                 <label>Match Chosen: {{ match }}</label>
             </div>
+           <div>
+                <label for="maps">Choose a map:</label>
+                    <select name="map" id="maps" required>
+                        {% for m in maps %}
+                            <option>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
             <div>
                 {{ form.submit }}
             </div>

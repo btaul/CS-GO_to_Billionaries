@@ -71,12 +71,22 @@ def player_event_and_match():
     cursor.execute(query)
     event = cursor.fetchone()
 
+    query3 = "SELECT map_name FROM picks INNER JOIN maps ON picks.map_id = maps.map_id WHERE match_id ='%s'" % match_id
+    cursor.execute(query3)
+    maps = cursor.fetchall()
+
     print("Player + Event + Match")
     print("Id: ", event[0])
     print("Name: ", event[1])
     print("Match Id: ", match[0])
 
-    return render_template("playerEventAndMatch.html", event=event[1], match=match[0], form=form)
+    m2 = []
+    for m in maps:
+        print("Map Name: ", m[0])
+        m2.append(m[0])
+        print("\n")
+
+    return render_template("playerEventAndMatch.html", maps=m2, event=event[1], match=match[0], form=form)
 
 
 @app.route('/team', methods=['GET', 'POST'])
