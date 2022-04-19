@@ -2,19 +2,18 @@
 
 
 {% block body %}
-<div class="sidebar">
-
-  
-    user interface checkbox search multiple select are put here
-</div>
-
-
-
-
-<div class="right">
-<h2>hello</h2>
-
-</div>
-
+    <div class="sidebar">
+       <form action="/players/event" method="POST">
+           <label for="events">Choose an event:</label>
+            <select name="event" id="events">
+            {% for e in events %}
+                <option>{{ e }}</option>
+            {% endfor %}
+            </select>
+            <div>
+                {{ form.submit }}
+            </div>
+       </form>
+    </div>
 
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+       <form action="/index" method="GET">
+            <div>
+                <label>Event Chosen: {{ event }}</label>
+            </div>
+            <div>
+                <label>Match Chosen: {{ match }}</label>
+            </div>
+            <div>
+                {{ form.submit }}
+            </div>
+       </form>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+       <form action="/players/event/match" method="POST">
+            <div>
+                <label>Event Chosen: {{ event }}</label>
+            </div>
+            <div>
+                <label for="matches">Choose a match:</label>
+            <select name="match" id="matches" required>
+            {% for m in matches %}
+                <option>{{ m }}</option>
+            {% endfor %}
+            </select>
+            </div>
+            <div>
+                {{ form.submit }}
+            </div>
+       </form>
+
+{% endblock %}
