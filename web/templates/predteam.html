@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+  {% block body %}
+  <link rel="stylesheet" href="{{url_for('static', filename= 'css/style.css')}}" >
+  <div  role="alert">
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    
+    {% for message in messages %}
+      <p style="color:red;">{{ message }}</p>
+    {% endfor %}
+    
+  {% endif %}
+{% endwith %}
+  </div>
+
+
+
+
+<div class="sidebar">
+  <form action=" " method="POST">
+    {{ form.hidden_tag() }}
+    <fieldset>
+        <legend>Enter team names</legend>
+        <div>
+            {{ form.team1name.label (class="form-label mt-4") }}
+            {% if form.team1name.errors %}
+                {{ form.team1name }}
+                {% for error in form.team1name.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+                {% else %}
+                {{ form.team1name (class="form-control") }}
+            {% endif %}
+
+        </div>
+        <div>
+          {{ form.team2name.label (class="form-label mt-4") }}
+          {% if form.team2name.errors %}
+              {{ form.team2name }}
+              {% for error in form.team2name.errors %}
+                  <span>{{ error }}</span>
+              {% endfor %}
+              {% else %}
+              {{ form.team2name (class="form-control")}}
+          {% endif %}
+
+      </div>
+      <div>
+        {{ form.selectmap.label (class="form-label mt-4") }}
+        {% if form.selectmap.errors %}
+            {{ form.selectmap }}
+            {% for error in form.selectmap.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+            {% else %}
+            {{ form.selectmap (class="form-select" )}}
+        {% endif %}
+
+    </div>
+    </fieldset>
+    <br/>
+    <div>
+        {{ form.submit }}
+    </div>
+</form>
+
+
+</div>
+
+<div class="right">
+
+
+     <h4>Prediction: {{winner}}</h4>
+
+
+</div>
+
+
+{% endblock %}
