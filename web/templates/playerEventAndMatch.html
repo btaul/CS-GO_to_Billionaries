@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+       <form action="/players/event/match/map" method="POST">
+            <div>
+                <label>Event Chosen: {{ event }}</label>
+            </div>
+
+            <div hidden>
+                <select name="event" required>
+                    <option>{{ event }}</option>
+                </select>
+            </div>
+
+
+            <div>
+                <label>Match Chosen: {{ match }}</label>
+            </div>
+
+            <div hidden>
+                <select name="match" required>
+                    <option>{{ match }}</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="maps">Choose a map:</label>
+                    <select name="map" id="maps" required>
+                        {% for m in maps %}
+                            <option>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            <div>
+                {{ form.submit }}
+            </div>
+       </form>
+
+{% endblock %}

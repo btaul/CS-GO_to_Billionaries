@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+    <div class="sidebar">
+            <div>
+                <label>Event Chosen: {{ event }}</label>
+            </div>
+
+            <div hidden>
+                <select name="event" required>
+                    <option>{{ event }}</option>
+                </select>
+            </div>
+
+
+            <div>
+                <label>Match Chosen: {{ match }}</label>
+            </div>
+
+            <div hidden>
+                <select name="match" required>
+                    <option>{{ match }}</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Map Chosen: {{ map }}</label>
+            </div>
+
+            <div hidden>
+                <select name="map" required>
+                    <option>{{ map }}</option>
+                </select>
+            </div>
+
+
+            <div>
+                <form method="GET" action="/index">
+                    <button type="submit">Homepage</button>
+                </form>
+            </div>
+    </div>
+
+
+<div class="right">
+
+
+      <div class="card-body">
+          <div class="chart-container" style="position: relative;">
+              <canvas id="myChart" style="width:100%;max-width:1900px"></canvas>
+          </div>
+      </div>
+
+
+</div>
+
+{% block javascript %}
+<script>
+
+
+
+
+
+
+var canvas = document.getElementById("myChart");
+
+
+var kda = {
+  label: 'KDA',
+  data: [{% for kda in kda %}
+"{{kda}}",
+{% endfor %}],
+  backgroundColor: '#5DA5DA ',
+  borderColor: "black",
+  yAxisID: "y-axis-density"
+};
+
+var adr = {
+  label: 'ADR',
+  data: [{% for adr in adr %}
+"{{adr}}",
+{% endfor %}],
+  backgroundColor: '#FAA43A',
+  borderColor: "black",
+  yAxisID: "y-axis-density"
+};
+
+var playerStats = {
+  labels: [{% for players in players %}
+"{{players}}",
+{% endfor %}],
+  datasets: [kda, adr]
+};
+
+var chartOptions = {
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-density"
+    }]
+  }
+};
+
+var barChart = new Chart(myChart, {
+  type: 'bar',
+  data: playerStats,
+  options: chartOptions
+});
+
+  </script>
+{% endblock%}
+
+{% endblock %}
