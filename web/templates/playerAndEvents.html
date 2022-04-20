@@ -6,6 +6,13 @@
             <div>
                 <label>Event Chosen: {{ event }}</label>
             </div>
+
+           <div hidden>
+                <select name="event" id="matches" required>
+                    <option>{{ event }}</option>
+                </select>
+            </div>
+
             <div>
                 <label for="matches">Choose a match:</label>
             <select name="match" id="matches" required>
