@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+<link rel="stylesheet" href="{{url_for('static', filename= 'css/style.css')}}" >
+<div  role="alert">
+  {% with messages = get_flashed_messages() %}
+{% if messages %}
+  
+  {% for message in messages %}
+    <p style="color:red;">{{ message }}</p>
+  {% endfor %}
+  
+{% endif %}
+{% endwith %}
+</div>
+
+<div class="sidebar">
+
+  
+    <form action=" " method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset>
+            <legend>Enter team names</legend>
+            <div>
+                {{ form.map.label (class="form-label mt-4") }}
+                {% if form.map.errors %}
+                    {{ form.map }}
+                    {% for error in form.map.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.map (class="form-control")}}
+                {% endif %}
+        
+            </div>
+            <div>
+                {{ form.player1.label (class="form-label mt-4") }}
+                {% if form.player1.errors %}
+                    {{ form.player1 }}
+                    {% for error in form.player1.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.player1 (class="form-control") }}
+                {% endif %}
+    
+            </div>
+            <div>
+                {{ form.player2.label (class="form-label mt-4") }}
+                {% if form.player1.errors %}
+                    {{ form.player1 }}
+                    {% for error in form.player1.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.player1 (class="form-control") }}
+                {% endif %}
+    
+            </div>
+            <div>
+                {{ form.player3.label (class="form-label mt-4") }}
+                {% if form.player1.errors %}
+                    {{ form.player1 }}
+                    {% for error in form.player1.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.player1 (class="form-control") }}
+                {% endif %}
+    
+            </div>
+            <div>
+                {{ form.player4.label (class="form-label mt-4") }}
+                {% if form.player1.errors %}
+                    {{ form.player1 }}
+                    {% for error in form.player1.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.player1 (class="form-control") }}
+                {% endif %}
+    
+            </div>
+            <div>
+                {{ form.player5.label (class="form-label mt-4") }}
+                {% if form.player1.errors %}
+                    {{ form.player1 }}
+                    {% for error in form.player1.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ form.player1 (class="form-control") }}
+                {% endif %}
+    
+            </div>
+
+        </fieldset>
+        <br/>
+        <div>
+            {{ form.submit }}
+        </div>
+</div>
+
+
+
+
+<div class="right">
+<h2>hello</h2>
+
+</div>
+
+
+{% endblock %}
