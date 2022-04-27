@@ -4,7 +4,7 @@ from web import app
 from flask import render_template, flash, request
 from web.forms import TeamForm
 from web.forms import SubmitForm
-from web.forms import TeamForm, PlayerPredForm
+from web.forms import TeamForm, PlayerPredForm,TeamPredForm
 from web import cursor
 
 
@@ -107,100 +107,133 @@ def player_event_match_and_map():
 @app.route('/team', methods=['GET', 'POST'])
 def team():
     form = TeamForm()
+    
+    cursor.execute("SELECT team_name FROM teams")
+    team_id = cursor.fetchall()
+    form.team1name.choices = [(i[0]) for i in team_id]
+    #form.team2name.choices = [(i[0]) for i in team_id]
+    map = []
+    maparr = []
+    sumarr = []
+    winarr = []
+    ratearr = []
+    
     if form.validate_on_submit():
-      
+       
+        maparr = []
+        sumarr = []
+        winarr = []
+        ratearr = []
+
+        cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team1name.data))
+        team1 = cursor.fetchone()
+        team1id= team1[0]
+        
+        # if team1id != 0: #team2id:
+        #     pass
+        # else:
+        #     flash('team names can\'t be same', 'warning')
+
+        cursor.execute("select map_name from maps where map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s'))"%(team1id))
+        map = cursor.fetchall()
+       
+        for item in map:
+            maparr.append(item[0])
+        print(maparr)
+        cursor.execute("select count(ss.roster_id) from (SELECT * FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s'))) AS ss group by ss.map_id order by ss.map_id"%(team1id, team1id))
+        sum = cursor.fetchall()
+        for item in sum:
+            sumarr.append(item[0])
+        print(sumarr)
+
+        cursor.execute("select COALESCE(sss.co,0) from (select ss.map_id,count(ss.roster_id) from (SELECT * FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s'))) AS ss group by ss.map_id order by ss.map_id) AS a left outer JOIN (select ss.map_id ,count(ss.roster_id) AS co from (SELECT * FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s')) AND won_this_map=1 ) AS ss group by ss.map_id) AS sss on a.map_id = sss.map_id order by a.map_id;"%(team1id, team1id,team1id, team1id))
+        win = cursor.fetchall()
+        for item in win:
+            winarr.append(item[0])
+        print(winarr)
         try:
-            cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team1name.data))
-            team1 = cursor.fetchone()
-            team1id= team1[0]
-
-            
+            for x in range(len(maparr)):
+                a = 100*winarr[x]/sumarr[x]
+                ratearr.append(a)
         except:
-            flash('invalid team1 name!', 'warning')
-
-        try:
-            cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team2name.data))
-            team2 = cursor.fetchone()
-            team2id= team2[0]
-            
-            
-        except:
-            flash('invalid team2 name!', 'error')
-
-        if team1id != team2id:
-            pass
-        else:
-            flash('team names can\'t be same', 'warning')
-
-
-
-    return render_template("team.html",form=form)
+            flash('no winning record on this team')
+        print(ratearr)
+    return render_template("team.html",form=form,ratearr = ratearr,maparr = maparr)
 
 
 @app.route('/teamperdiction', methods=['GET', 'POST'])
 def teampred():
-    form = TeamForm()
+    form = TeamPredForm()
     winner = 'no result'
     cursor.execute("SELECT map_name FROM maps")
     data_id = cursor.fetchall()
     form.selectmap.choices = [(i[0]) for i in data_id]
     mapid = 0
+    winrate = 'no result'
+    rate_1 = 0
+    rate_2=0
+
+    cursor.execute("SELECT team_name FROM teams")
+    team_id = cursor.fetchall()
+    form.team1name.choices = [(i[0]) for i in team_id]
+    form.team2name.choices = [(i[0]) for i in team_id]
+
     if form.validate_on_submit():
         if form.team1name.data != form.team2name.data:
             pass
-        else:
-            flash('team names can\'t be same', 'warning')
+
 
       
-        try:
+        
             cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team1name.data))
             team1 = cursor.fetchone()
             team1id= team1[0]
 
-            
-        except:
-            flash('invalid team1 name!', 'warning')
-
-        try:
             cursor.execute("SELECT team_id FROM teams WHERE team_name='%s'"%(form.team2name.data))
             team2 = cursor.fetchone()
             team2id= team2[0]
 
+
+            
+       
             try:
-                cursor.execute("SELECT map_id FROM maps WHERE map_name='%s'"%(form.selectmap.data))
-                map = cursor.fetchone()
-                mapid= map[0]
+
+                try:
+                    cursor.execute("SELECT map_id FROM maps WHERE map_name='%s'"%(form.selectmap.data))
+                    map = cursor.fetchone()
+                    mapid= map[0]
         
-                cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team1id,mapid))
-                num1 = cursor.fetchone()
-                cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team1id,mapid))
-                win1 = cursor.fetchone()
-                rate1 = win1[0]/num1[0]
+                    cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team1id,mapid))
+                    num1 = cursor.fetchone()
+                    cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team1id,mapid))
+                    win1 = cursor.fetchone()
+                    rate1 = win1[0]/num1[0]
 
-                cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team2id,mapid))
-                num2 = cursor.fetchone()
-                cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team2id,mapid))
-                win2 = cursor.fetchone()
-                rate2 = win2[0]/num2[0]
-             
-                if rate1 > rate2:
-                    winner = form.team1name.data
-                else:
-                    winner = form.team2name.data
+                    cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team2id,mapid))
+                    num2 = cursor.fetchone()
+                    cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team2id,mapid))
+                    win2 = cursor.fetchone()
+                    rate2 = win2[0]/num2[0]
+                    rate_1 = 100*rate1/(rate1+rate2)
+                    rate_2 = 100*rate2/(rate1+rate2)
+                    if rate1 > rate2:
+                        winner = form.team1name.data
+                        winrate = rate_1
+                    else:
+                        winner = form.team2name.data
+                        winrate = rate_2
+
+                   
+                except:
+                    flash('Due to our limit database records, we can\'t predict the two teams on this map', 'warning')
             except:
-                flash('please check input', 'warning')
-
-            
-            
-        except:
-            flash('invalid team2 name!', 'error')
+                    flash('please check input', 'warning')
+        else:
+            flash('team names can\'t be same', 'warning')      
           
 
-       
 
-
-
-    return render_template("predteam.html",form=form,winner=winner)
+    return render_template("predteam.html",form=form,winner=winner,winrate=winrate,rate_1=rate_1,rate_2=rate_2)
   
 
 @app.route('/playerperdiction', methods=['GET', 'POST'])
