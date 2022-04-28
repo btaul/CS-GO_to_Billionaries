@@ -30,7 +30,7 @@
                     <span>{{ error }}</span>
                 {% endfor %}
                 {% else %}
-                {{ form.team1name (class="form-control") }}
+                {{ form.team1name (class="form-select") }}
             {% endif %}
 
         </div>
@@ -42,7 +42,7 @@
                   <span>{{ error }}</span>
               {% endfor %}
               {% else %}
-              {{ form.team2name (class="form-control")}}
+              {{ form.team2name (class="form-select")}}
           {% endif %}
 
       </div>
@@ -68,13 +68,65 @@
 
 </div>
 
-<div class="right">
+<div class="right"  style="text-align: center;" >
+  <h4>Prediction: {{winner}}</h4>
+  <h5>Winning rate: {{winrate}}%</h5>
+  <div class="card-body" style="padding-left: 280px;">
+<br/>
+    <canvas id="income_vs_expense" style="width:100%;max-width:450px;max-height:450px"></canvas>
+    <div class="chart-container" style="margin:auto">
 
+      
+    </div>
+</div>
 
-     <h4>Prediction: {{winner}}</h4>
+<div>
 
 
 </div>
 
+     
+
+
+</div>
+{% block javascript %}
+<script>
+    let income_vs_expense_chart = new Chart(income_vs_expense, {
+            type: 'pie',
+            data: {
+            labels: ['team1 (%)', 'team2 (%)'],
+                datasets: [{
+                    label: "winning rate",
+                    data: [{{rate_1}},{{rate_2}}],
+                    backgroundColor: ['#5DA5DA ', '#FAA43A'],
+
+                    borderWidth: 1,
+                    hoverBorderColor: "black",
+                    hoverBorderWidth: 2,
+                
+                    pointHoverRadius: 5
+                }],
+            },
+            options: {
+                    title: {
+                        display: true,
+                            text: "Income Vs Expenses",
+                                fontSize: 20,
+                    },
+                    legend: {
+                        position: "right",
+                            labels: {
+                            fontColor: "gray"
+                        },
+                        display: true,
+                    },
+
+                    elements: {
+                        hitRadius: 3,
+                    }
+            }
+        })
+</script>
+{% endblock%}
 
 {% endblock %}

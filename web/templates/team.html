@@ -30,22 +30,11 @@
                     <span>{{ error }}</span>
                 {% endfor %}
                 {% else %}
-                {{ form.team1name (class="form-control") }}
+                {{ form.team1name (class="form-select") }}
             {% endif %}
 
         </div>
-        <div>
-          {{ form.team2name.label (class="form-label mt-4") }}
-          {% if form.team2name.errors %}
-              {{ form.team2name }}
-              {% for error in form.team2name.errors %}
-                  <span>{{ error }}</span>
-              {% endfor %}
-              {% else %}
-              {{ form.team2name (class="form-control")}}
-          {% endif %}
 
-      </div>
     </fieldset>
     <br/>
     <div>
@@ -71,35 +60,34 @@
 {% block javascript %}
 <script>
 
-  
+var rate=  [{% for item in ratearr %}
+{{item}},
+{% endfor %}];  
 
-     
+var map=  [{% for item in maparr %}
+"{{item}}",
+{% endfor %}];     
 
 
 var densityCanvas = document.getElementById("myChart");
 
 
 var densityData = {
-  label: 'Team1',
-  data: [5427, 5243, 5514, 3933, 1326, 687, 1271, 1638],
-  backgroundColor: '#5DA5DA ',
-  borderColor: "black",
-  yAxisID: "y-axis-density"
-};
- 
-var gravityData = {
-  label: 'Team2',
-  data: [2427, 3243, 5514, 6933, 1326, 1187, 4271, 938],
+  label: 'Team1(%)',
+  data: rate,
   backgroundColor: '#FAA43A',
   borderColor: "black",
   yAxisID: "y-axis-density"
 };
  
-var planetData = {
-  labels: ["map1", "map2", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"],
-  datasets: [densityData, gravityData]
-};
+
  
+var planetData = {
+  labels: map,
+  datasets: [densityData]
+};
+
+
 var chartOptions = {
   scales: {
     xAxes: [{
@@ -111,7 +99,6 @@ var chartOptions = {
     }]
   }
 };
- 
 var barChart = new Chart(myChart, {
   type: 'bar',
   data: planetData,

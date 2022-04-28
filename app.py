@@ -1,6 +1,6 @@
 from flask import Flask
 from flaskext import mysql
-
+from web import app
 
 app = Flask(__name__)
 
