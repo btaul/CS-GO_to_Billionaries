@@ -18,81 +18,58 @@
 <div class="sidebar">
 
   
-    <form action=" " method="POST">
+    <form action="/playerperdiction/submit" method="POST">
         {{ form.hidden_tag() }}
         <fieldset>
-            <legend>Enter team names</legend>
             <div>
-                {{ form.map.label (class="form-label mt-4") }}
-                {% if form.map.errors %}
-                    {{ form.map }}
-                    {% for error in form.map.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.map (class="form-control")}}
-                {% endif %}
-        
+               <label for="maps">Choose a map:</label>
+                    <select name="map" id="maps">
+                        {% for m in maps %}
+                            <option>{{ m }}</option>
+                        {% endfor %}
+                    </select>
             </div>
             <div>
-                {{ form.player1.label (class="form-label mt-4") }}
-                {% if form.player1.errors %}
-                    {{ form.player1 }}
-                    {% for error in form.player1.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.player1 (class="form-control") }}
-                {% endif %}
+               <label for="players">Choose Player 1:</label>
+                    <select name="player1" id="players1" required>
+                        {% for p in players %}
+                            <option>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            <div>
+                 <label for="players">Choose Player 2:</label>
+                    <select name="player2" id="players2" required>
+                        {% for p in players %}
+                            <option>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            <div class="my-2">
+                 <label for="players">Choose Player 3:</label>
+                    <select name="player3" id="players3" required>
+                        {% for p in players %}
+                            <option>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+    
+            </div>
+            <div class="my-2">
+                 <label for="players">Choose Player 4:</label>
+                    <select name="player4" id="players4" required>
+                        {% for p in players %}
+                            <option>{{ p }}</option>
+                        {% endfor %}
+                    </select>
     
             </div>
             <div>
-                {{ form.player2.label (class="form-label mt-4") }}
-                {% if form.player1.errors %}
-                    {{ form.player1 }}
-                    {% for error in form.player1.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.player1 (class="form-control") }}
-                {% endif %}
-    
-            </div>
-            <div>
-                {{ form.player3.label (class="form-label mt-4") }}
-                {% if form.player1.errors %}
-                    {{ form.player1 }}
-                    {% for error in form.player1.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.player1 (class="form-control") }}
-                {% endif %}
-    
-            </div>
-            <div>
-                {{ form.player4.label (class="form-label mt-4") }}
-                {% if form.player1.errors %}
-                    {{ form.player1 }}
-                    {% for error in form.player1.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.player1 (class="form-control") }}
-                {% endif %}
-    
-            </div>
-            <div>
-                {{ form.player5.label (class="form-label mt-4") }}
-                {% if form.player1.errors %}
-                    {{ form.player1 }}
-                    {% for error in form.player1.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    {% else %}
-                    {{ form.player1 (class="form-control") }}
-                {% endif %}
-    
+                <label for="players">Choose Player 5:</label>
+                    <select name="player5" id="players5" required>
+                        {% for p in players %}
+                            <option>{{ p }}</option>
+                        {% endfor %}
+                    </select>
             </div>
 
         </fieldset>
@@ -106,9 +83,61 @@
 
 
 <div class="right">
-<h2>hello</h2>
-
+<h2>Player to target: {{ target }}</h2>
+<h3>Reasoning: {{ reason }}</h3>
+     <div class="card-body">
+          <div class="chart-container" style="position: relative;">
+              <canvas id="myChart" style="width:100%;max-width:1900px"></canvas>
+          </div>
+      </div>
 </div>
 
+    {% block javascript %}
+<script>
+
+
+
+
+
+
+var canvas = document.getElementById("myChart");
+
+var stats = {
+  label: 'Player Stats',
+  data: [{% for stats in stats %}
+"{{stats}}",
+{% endfor %}],
+  backgroundColor: '#FAA43A',
+  borderColor: "black",
+  yAxisID: "y-axis-density"
+};
+
+var playerStats = {
+  labels: [{% for labels in labels %}
+"{{labels}}",
+{% endfor %}],
+  datasets: [stats]
+};
+
+var chartOptions = {
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-density"
+    }]
+  }
+};
+
+var barChart = new Chart(myChart, {
+  type: 'bar',
+  data: playerStats,
+  options: chartOptions
+});
+
+  </script>
+{% endblock%}
 
 {% endblock %}
