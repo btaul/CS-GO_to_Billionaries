@@ -9,15 +9,6 @@ class TeamForm(FlaskForm):
     selectmap =  SelectField(u'Map')
     submit = SubmitField(label='Predict', validators=[DataRequired()])
 
-class PlayerPredForm(FlaskForm):
-    player1 = StringField('Player1', validators=[DataRequired()])
-    player2 = StringField('Player2', validators=[DataRequired()])
-    player3 = StringField('Player3', validators=[DataRequired()])
-    player4 = StringField('Player4', validators=[DataRequired()])
-    player5 = StringField('Player5', validators=[DataRequired()])
-    map = StringField('Map', validators=[DataRequired()])
-    submit = SubmitField(label='Predict', validators=[DataRequired()])
-
 
 class SubmitForm(FlaskForm):
     submit = SubmitField(label='Submit', validators=[DataRequired()])

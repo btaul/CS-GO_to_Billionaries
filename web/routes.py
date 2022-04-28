@@ -4,7 +4,7 @@ from web import app
 from flask import render_template, flash, request
 from web.forms import TeamForm
 from web.forms import SubmitForm
-from web.forms import TeamForm, PlayerPredForm
+from web.forms import TeamForm
 from web import cursor
 
 
@@ -203,13 +203,341 @@ def teampred():
     return render_template("predteam.html",form=form,winner=winner)
   
 
-@app.route('/playerperdiction', methods=['GET', 'POST'])
+@app.route('/playerperdiction', methods=['GET'])
 def playerpred():
-    form = PlayerPredForm()
-    if form.validate_on_submit():
-      
-        pass
+    form = SubmitForm()
+    query = "SELECT map_name FROM maps"
+    cursor.execute(query)
+    maps = cursor.fetchall()
+    map_names = []
+    player_names = [" "]
+    query2 = "SELECT DISTINCT player_name FROM players INNER JOIN player_performance ON players.player_id = player_performance.player_id ORDER BY player_name ASC"
+    cursor.execute(query2)
+    tmp = cursor.fetchall()
+    for t in tmp:
+        player_names.append(t[0])
+    for m in maps:
+        map_names.append(m[0])
+
+    return render_template("predplayer.html", form=form, maps=map_names, players=player_names)
 
 
+@app.route('/playerperdiction/submit', methods=['POST'])
+def playerpred_calculation():
+    form = SubmitForm()
+    p1 = request.form['player1']
+    p2 = request.form['player2']
+    p3 = request.form['player3']
+    p4 = request.form['player4']
+    p5 = request.form['player5']
+    map_name = request.form['map']
 
-    return render_template("predplayer.html",form=form)
+    query = "SELECT map_name FROM maps"
+    cursor.execute(query)
+    maps = cursor.fetchall()
+    player_names = [" "]
+    map_names = []
+    query2 = "SELECT DISTINCT player_name FROM players INNER JOIN player_performance ON players.player_id = player_performance.player_id ORDER BY player_name ASC"
+    cursor.execute(query2)
+    tmp = cursor.fetchall()
+    for t in tmp:
+        player_names.append(t[0])
+    for m in maps:
+        map_names.append(m[0])
+
+    if p1 == p2 or p1 == p3 or p1 == p4 or p1 == p5 or \
+            p2 == p3 or p2 == p4 or p2 == p5 or \
+            p3 == p4 or p3 == p5 or \
+            p4 == p5:
+
+        flash('Please Check Player Names', 'error')
+
+        return render_template("predplayer.html", form=form, maps=map_names, players=player_names)
+
+    print("Map map:" + map_name)
+
+    #######################################################################################
+
+    p1query = "SELECT * FROM player_performance " \
+              "LEFT JOIN players ON players.player_id = player_performance.player_id " \
+              "JOIN maps ON player_performance.map_id = maps.map_id " \
+              "WHERE player_name = '%s' AND map_name = '%s'" % (p1, map_name)
+    cursor.execute(p1query)
+    player_history = cursor.fetchall()
+
+    print("Player 1: " + p1)
+    p1KDA = 0
+    p1ADR = 0
+    p1Ranking = 0
+    counter = 0
+    if not player_history:
+        flash(p1 + " has no matches for Map: " + map_name, 'error')
+    for h in player_history:
+        print("Player 1")
+        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
+        counter += 1
+        p1ADR += h[7]
+        p1Ranking += h[6]
+
+        if h[4] != 0:
+            formula = float(h[3] + (.5 * h[5])) / float(h[4])
+        else:
+            formula = float(h[3] + (.5 * h[5]))
+
+        p1KDA += formula
+
+    if counter != 0:
+        p1ADR /= counter
+        p1Ranking /= counter
+        p1KDA /= counter
+
+    ##########################################################################################
+
+    p2query = "SELECT * FROM player_performance " \
+              "LEFT JOIN players ON players.player_id = player_performance.player_id " \
+              "JOIN maps ON player_performance.map_id = maps.map_id " \
+              "WHERE player_name = '%s' AND map_name = '%s'" % (p2, map_name)
+    cursor.execute(p2query)
+    player2_history = cursor.fetchall()
+
+    print("Player 2: " + p2)
+    p2KDA = 0
+    p2ADR = 0
+    p2Ranking = 0
+    counter = 0
+    if not player2_history:
+        flash(p2 + " has no matches for Map: " + map_name, 'error')
+    for h in player2_history:
+        print("Player 2")
+        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
+
+        counter += 1
+        p2ADR += h[7]
+        p2Ranking += h[6]
+
+        if h[4] != 0:
+            formula = float(h[3] + (.5 * h[5])) / float(h[4])
+        else:
+            formula = float(h[3] + (.5 * h[5]))
+
+        p2KDA += formula
+
+    if counter != 0:
+        p2ADR /= counter
+        p2Ranking /= counter
+        p2KDA /= counter
+
+    ##########################################################################################
+
+    p3query = "SELECT * FROM player_performance " \
+              "LEFT JOIN players ON players.player_id = player_performance.player_id " \
+              "JOIN maps ON player_performance.map_id = maps.map_id " \
+              "WHERE player_name = '%s' AND map_name = '%s'" % (p3, map_name)
+    cursor.execute(p3query)
+    player3_history = cursor.fetchall()
+
+    print("Player 3: " + p3)
+    p3KDA = 0
+    p3ADR = 0
+    p3Ranking = 0
+    counter = 0
+    if not player3_history:
+        flash(p3 + " has no matches for Map: " + map_name, 'error')
+    for h in player3_history:
+        print("Player 3")
+        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
+
+        counter += 1
+        p3ADR += h[7]
+        p3Ranking += h[6]
+
+        if h[4] != 0:
+            formula = float(h[3] + (.5 * h[5])) / float(h[4])
+        else:
+            formula = float(h[3] + (.5 * h[5]))
+
+        p3KDA += formula
+
+    if counter != 0:
+        p3ADR /= counter
+        p3Ranking /= counter
+        p3KDA /= counter
+
+    ##########################################################################################
+
+    p4query = "SELECT * FROM player_performance " \
+              "LEFT JOIN players ON players.player_id = player_performance.player_id " \
+              "JOIN maps ON player_performance.map_id = maps.map_id " \
+              "WHERE player_name = '%s' AND map_name = '%s'" % (p4, map_name)
+    cursor.execute(p4query)
+    player4_history = cursor.fetchall()
+
+    print("Player 4: " + p4)
+    p4KDA = 0
+    p4ADR = 0
+    p4Ranking = 0
+    counter = 0
+    if not player4_history:
+        flash(p4 + " has no matches for Map: " + map_name, 'error')
+    for h in player4_history:
+        print("Player 4")
+        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
+
+        counter += 1
+        p4ADR += h[7]
+        p4Ranking += h[6]
+
+        if h[4] != 0:
+            formula = float(h[3] + (.5 * h[5])) / float(h[4])
+        else:
+            formula = float(h[3] + (.5 * h[5]))
+
+        p4KDA += formula
+
+    if counter != 0:
+        p4ADR /= counter
+        p4Ranking /= counter
+        p4KDA /= counter
+
+    ##########################################################################################
+
+    p5query = "SELECT * FROM player_performance " \
+              "LEFT JOIN players ON players.player_id = player_performance.player_id " \
+              "JOIN maps ON player_performance.map_id = maps.map_id " \
+              "WHERE player_name = '%s' AND map_name = '%s'" % (p5, map_name)
+    cursor.execute(p5query)
+    player5_history = cursor.fetchall()
+
+    print("Player 5: " + p5)
+    p5KDA = 0
+    p5ADR = 0
+    p5Ranking = 0
+    counter = 0
+    if not player5_history:
+        flash(p5 + " has no matches for Map: " + map_name, 'error')
+    for h in player5_history:
+        print("Player 5")
+        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
+
+        counter += 1
+        p5ADR += h[7]
+        p5Ranking += h[6]
+
+        if h[4] != 0:
+            formula = float(h[3] + (.5 * h[5])) / float(h[4])
+        else:
+            formula = float(h[3] + (.5 * h[5]))
+
+        p5KDA += formula
+
+    if counter != 0:
+        p5ADR /= counter
+        p5Ranking /= counter
+        p5KDA /= counter
+
+    #############################################################################################
+
+    target = " "
+    max_adr = max(p1ADR, p2ADR, p3ADR, p4ADR, p5ADR)
+    max_kda = max(p1KDA, p2KDA, p3KDA, p4KDA, p5KDA)
+    max_ranking = max(p1Ranking, p2Ranking, p3Ranking, p4Ranking, p5Ranking)
+    stats = []
+    reasoning = ""
+
+    if max_adr == p1ADR and max_ranking == p1Ranking and max_kda == p1KDA:
+        target = p1
+        stats.append(p1ADR)
+        stats.append(p1Ranking)
+        stats.append(p1KDA)
+        reasoning = p1 + " had highest average ranking, adr, and kda."
+    elif max_adr == p2ADR and max_ranking == p2Ranking and max_kda == p2KDA:
+        target = p2
+        stats.append(p2ADR)
+        stats.append(p2Ranking)
+        stats.append(p2KDA)
+        reasoning = p2 + " had highest average ranking, adr, and kda."
+    elif max_adr == p3ADR and max_ranking == p3Ranking and max_kda == p3KDA:
+        target = p3
+        stats.append(p3ADR)
+        stats.append(p3Ranking)
+        stats.append(p3KDA)
+        reasoning = p3 + " had highest average ranking, adr, and kda."
+    elif max_adr == p4ADR and max_ranking == p4Ranking and max_kda == p4KDA:
+        target = p4
+        stats.append(p4ADR)
+        stats.append(p4Ranking)
+        stats.append(p4KDA)
+        reasoning = p4 + " had highest average ranking, adr, and kda."
+    elif max_adr == p5ADR and max_ranking == p5Ranking and max_kda == p5KDA:
+        target = p5
+        stats.append(p5ADR)
+        stats.append(p5Ranking)
+        stats.append(p5KDA)
+        reasoning = p5 + " had highest average ranking, adr, and kda."
+
+    if target == " ":
+        if max_adr == p1ADR and max_ranking == p1Ranking:
+            target = p1
+            stats.append(p1ADR)
+            stats.append(p1Ranking)
+            reasoning = p1 + " had highest average ranking and adr."
+        elif max_adr == p2ADR and max_ranking == p2Ranking:
+            target = p2
+            stats.append(p2ADR)
+            stats.append(p2Ranking)
+            stats.append(p2KDA)
+            reasoning = p2 + " had highest average ranking and adr."
+        elif max_adr == p3ADR and max_ranking == p3Ranking:
+            target = p3
+            stats.append(p3ADR)
+            stats.append(p3Ranking)
+            stats.append(p3KDA)
+            reasoning = p3 + " had highest average ranking and adr."
+        elif max_adr == p4ADR and max_ranking == p4Ranking:
+            target = p4
+            stats.append(p4ADR)
+            stats.append(p4Ranking)
+            stats.append(p4KDA)
+            reasoning = p4 + " had highest average ranking and adr."
+        elif max_adr == p5ADR and max_ranking == p5Ranking:
+            target = p5
+            stats.append(p5ADR)
+            stats.append(p5Ranking)
+            stats.append(p5KDA)
+            reasoning = p5 + " had highest average ranking and adr."
+
+    if target == " ":
+        if max_ranking == p1Ranking:
+            target = p1
+            stats.append(p1ADR)
+            stats.append(p1Ranking)
+            stats.append(p1KDA)
+            reasoning = p1 + " had highest average ranking."
+        elif max_ranking == p2Ranking:
+            target = p2
+            stats.append(p2ADR)
+            stats.append(p2Ranking)
+            stats.append(p2KDA)
+            reasoning = p2 + " had highest average ranking."
+        elif max_ranking == p3Ranking:
+            target = p3
+            stats.append(p3ADR)
+            stats.append(p3Ranking)
+            stats.append(p3KDA)
+            reasoning = p3 + " had highest average ranking."
+        elif max_ranking == p4Ranking:
+            target = p4
+            stats.append(p4ADR)
+            stats.append(p4Ranking)
+            stats.append(p4KDA)
+            reasoning = p4 + " had highest average ranking."
+        elif max_ranking == p5Ranking:
+            target = p5
+            stats.append(p5ADR)
+            stats.append(p5Ranking)
+            stats.append(p5KDA)
+            reasoning = p5 + " had highest average ranking."
+
+    labels = ["ADR", "Ranking", "KDA"]
+
+    return render_template("predplayer.html", form=form, maps=map_names, players=player_names, target=target, stats=stats, labels=labels, reason=reasoning)
