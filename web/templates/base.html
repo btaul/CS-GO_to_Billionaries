@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>CS-GO to Billionaries</title>
+        <title>CS-GO to Millionaries</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -30,6 +30,9 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{url_for('playerpred')}}">Player</a>
                 </div>
+              </li>
+                <li class="nav-item">
+                <a class="nav-link" href="{{url_for('manual')}}">User Manual</a>
               </li>
             </ul>
             <ul class="navbar-nav ms-md-auto">

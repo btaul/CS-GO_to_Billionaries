@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+<div class="right">
+<h2>Prediction System</h2>
+<hr>
+<h3>
+    Players
+</h3>
+<br>
+<h4>Description</h4>
+To use the player prediction system. You have to enter five players names and a map. This is done by using the drop down menus.
+<br>
+Don't worry. The list is sorted alphabetically. You will only see players that have match history but the not on the map select.
+<br>
+The system will tell you if you choose a player name that does not work.
+<br><br>
+<h4>Priorities</h4>
+The prediction system uses a priority based ranking system. The lower the number the higher the priority.
+<br>
+1. Player Ranking
+<br>
+2. ADR
+<br>
+3. KDA
+<br><hr>
+    <h3>Teams</h3>
+<br><hr>
+<h2>Visualization System</h2>
+<hr>
+<h3>
+    Players
+</h3>
+<br>
+<h4>Description</h4>
+To use the player visualization system. You first must enter a event name done by a drop down. This list is alphabetically sorted.
+<br>
+After that, you have to enter in a match id. There is no other way to find a match, you will just have to guess and check until you find the one you want.
+<br>
+Finally, you can then select a map for that match and you will be able to see the visualized data.
+<br>
+You will be able to see KDA and ADR for all ten players for that map/match.
+
+</div>
+{% endblock %}

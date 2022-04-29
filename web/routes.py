@@ -16,6 +16,11 @@ def index():
     return render_template("home.html")
 
 
+@app.route('/manual', methods=['GET', 'POST'])
+def manual():
+    return render_template("manual.html")
+
+
 @app.route('/players', methods=['GET'])
 def player():
     form = SubmitForm()
