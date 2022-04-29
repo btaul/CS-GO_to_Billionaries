@@ -1,10 +1,7 @@
-from tkinter import W
 from web import app
 
 from flask import render_template, flash, request
-from web.forms import TeamForm
-from web.forms import SubmitForm
-from web.forms import TeamForm, TeamPredForm
+from web.forms import SubmitForm, TeamPredForm, TeamForm
 
 from web import cursor
 
@@ -22,12 +19,15 @@ def index():
 @app.route('/players', methods=['GET'])
 def player():
     form = SubmitForm()
-    cursor.execute("SELECT * FROM events")
+    cursor.execute("SELECT DISTINCT event_name FROM events "
+                   "JOIN matches ON events.event_id = matches.event_id "
+                   "JOIN player_performance ON matches.match_id = player_performance.match_id "
+                   "ORDER BY event_name ASC")
     events = cursor.fetchall()
     e = []
     for event in events:
 
-        e.append(event[1])
+        e.append(event[0])
 
     return render_template("player.html", events=e, form=form)
 
@@ -37,11 +37,9 @@ def player_and_event():
     form = SubmitForm()
     event_name = request.form['event']
 
-    query = "SELECT * FROM events WHERE event_name ='%s'" % event_name
-    cursor.execute(query)
-    event = cursor.fetchone()
-
-    query2 = "SELECT match_id FROM matches WHERE event_id ='%s'" % event[0]
+    query2 = "SELECT match_id FROM matches " \
+             "JOIN events ON matches.event_id = events.event_id " \
+             "WHERE event_name ='%s'" % event_name
     cursor.execute(query2)
     matches = cursor.fetchmany()
 
@@ -58,7 +56,9 @@ def player_event_and_match():
     event_name = request.form['event']
     match_id = request.form['match']
 
-    query = "SELECT map_name FROM picks INNER JOIN maps ON picks.map_id = maps.map_id WHERE match_id ='%s'" % match_id
+    query = "SELECT DISTINCT map_name FROM player_performance " \
+            "JOIN maps ON player_performance.map_id = maps.map_id " \
+            "WHERE match_id ='%s'" % match_id
     cursor.execute(query)
     maps = cursor.fetchall()
 
@@ -240,7 +240,9 @@ def teampred():
 @app.route('/playerperdiction', methods=['GET'])
 def playerpred():
     form = SubmitForm()
-    query = "SELECT map_name FROM maps"
+    query = "SELECT map_name, COUNT(*) FROM player_performance " \
+            "join maps on player_performance.map_id = maps.map_id " \
+            "group by player_performance.map_id"
     cursor.execute(query)
     maps = cursor.fetchall()
     map_names = []
@@ -266,12 +268,16 @@ def playerpred_calculation():
     p5 = request.form['player5']
     map_name = request.form['map']
 
-    query = "SELECT map_name FROM maps"
+    query = "SELECT map_name, COUNT(*) FROM player_performance " \
+            "join maps on player_performance.map_id = maps.map_id " \
+            "group by player_performance.map_id"
     cursor.execute(query)
     maps = cursor.fetchall()
     player_names = [" "]
     map_names = []
-    query2 = "SELECT DISTINCT player_name FROM players INNER JOIN player_performance ON players.player_id = player_performance.player_id ORDER BY player_name ASC"
+    query2 = "SELECT DISTINCT player_name FROM players " \
+             "INNER JOIN player_performance ON players.player_id = player_performance.player_id " \
+             "ORDER BY player_name ASC"
     cursor.execute(query2)
     tmp = cursor.fetchall()
     for t in tmp:
@@ -299,7 +305,6 @@ def playerpred_calculation():
     cursor.execute(p1query)
     player_history = cursor.fetchall()
 
-    print("Player 1: " + p1)
     p1KDA = 0
     p1ADR = 0
     p1Ranking = 0
@@ -307,8 +312,6 @@ def playerpred_calculation():
     if not player_history:
         flash(p1 + " has no matches for Map: " + map_name, 'error')
     for h in player_history:
-        print("Player 1")
-        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
         counter += 1
         p1ADR += h[7]
         p1Ranking += h[6]
@@ -334,7 +337,6 @@ def playerpred_calculation():
     cursor.execute(p2query)
     player2_history = cursor.fetchall()
 
-    print("Player 2: " + p2)
     p2KDA = 0
     p2ADR = 0
     p2Ranking = 0
@@ -342,8 +344,6 @@ def playerpred_calculation():
     if not player2_history:
         flash(p2 + " has no matches for Map: " + map_name, 'error')
     for h in player2_history:
-        print("Player 2")
-        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
 
         counter += 1
         p2ADR += h[7]
@@ -370,7 +370,6 @@ def playerpred_calculation():
     cursor.execute(p3query)
     player3_history = cursor.fetchall()
 
-    print("Player 3: " + p3)
     p3KDA = 0
     p3ADR = 0
     p3Ranking = 0
@@ -378,8 +377,6 @@ def playerpred_calculation():
     if not player3_history:
         flash(p3 + " has no matches for Map: " + map_name, 'error')
     for h in player3_history:
-        print("Player 3")
-        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
 
         counter += 1
         p3ADR += h[7]
@@ -406,7 +403,6 @@ def playerpred_calculation():
     cursor.execute(p4query)
     player4_history = cursor.fetchall()
 
-    print("Player 4: " + p4)
     p4KDA = 0
     p4ADR = 0
     p4Ranking = 0
@@ -414,8 +410,6 @@ def playerpred_calculation():
     if not player4_history:
         flash(p4 + " has no matches for Map: " + map_name, 'error')
     for h in player4_history:
-        print("Player 4")
-        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
 
         counter += 1
         p4ADR += h[7]
@@ -442,7 +436,6 @@ def playerpred_calculation():
     cursor.execute(p5query)
     player5_history = cursor.fetchall()
 
-    print("Player 5: " + p5)
     p5KDA = 0
     p5ADR = 0
     p5Ranking = 0
@@ -450,8 +443,6 @@ def playerpred_calculation():
     if not player5_history:
         flash(p5 + " has no matches for Map: " + map_name, 'error')
     for h in player5_history:
-        print("Player 5")
-        print("Match id: " + str(h[1]) + " Map id: " + str(h[2]) + " Kills: " + str(h[3]) + " Deaths: " + str(h[4]) + " Assists: " + str(h[5]) + " Rating: " + str(h[6]) + " ADR: " + str(h[7]))
 
         counter += 1
         p5ADR += h[7]

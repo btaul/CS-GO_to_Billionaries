@@ -11,5 +11,11 @@ class TeamPredForm(FlaskForm):
     submit = SubmitField(label='Predict', validators=[DataRequired()])
 
 
+class TeamForm(FlaskForm):
+    team1name =  SelectField(u'Pick a team')
+    #team2name =  SelectField(u'Pick a team to compare')
+    submit = SubmitField(label='Submit')
+
+
 class SubmitForm(FlaskForm):
     submit = SubmitField(label='Submit', validators=[DataRequired()])
