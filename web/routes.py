@@ -220,14 +220,17 @@ def teampred():
                     cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team2id,mapid))
                     win2 = cursor.fetchone()
                     rate2 = win2[0]/num2[0]
-                    rate_1 = 100*rate1/(rate1+rate2)
-                    rate_2 = 100*rate2/(rate1+rate2)
-                    if rate1 > rate2:
-                        winner = form.team1name.data
-                        winrate = rate_1
+                    if rate1 == 0 or rate2 == 0:
+                        flash('Due to our limit database records, we can\'t predict the two teams on this map', 'warning')
                     else:
-                        winner = form.team2name.data
-                        winrate = rate_2
+                        rate_1 = 100*rate1/(rate1+rate2)
+                        rate_2 = 100*rate2/(rate1+rate2)
+                        if rate1 > rate2:
+                            winner = form.team1name.data
+                            winrate = round(rate_1,2)
+                        else:
+                            winner = form.team2name.data
+                            winrate = round(rate_2,2)
 
                    
                 except:
