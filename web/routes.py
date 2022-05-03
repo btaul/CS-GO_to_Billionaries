@@ -140,7 +140,7 @@ def team():
         # else:
         #     flash('team names can\'t be same', 'warning')
 
-        cursor.execute("select map_name from maps where map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s'))"%(team1id))
+        cursor.execute("select map_name from maps where map_id in (SELECT distinct map_id FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s')) order by map_id"%(team1id))
         map = cursor.fetchall()
        
         for item in map:
@@ -176,8 +176,8 @@ def teampred():
     form.selectmap.choices = [(i[0]) for i in data_id]
     mapid = 0
     winrate = 'no result'
-    rate_1 = 0
-    rate_2=0
+    rate_1 = 0.0
+    rate_2=0.0
 
     cursor.execute("SELECT team_name FROM teams")
     team_id = cursor.fetchall()
@@ -208,18 +208,22 @@ def teampred():
                     cursor.execute("SELECT map_id FROM maps WHERE map_name='%s'"%(form.selectmap.data))
                     map = cursor.fetchone()
                     mapid= map[0]
-        
+                    
                     cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team1id,mapid))
                     num1 = cursor.fetchone()
+                    print(11111)
                     cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team1id,mapid))
                     win1 = cursor.fetchone()
+                    rate1 = 0.0
                     rate1 = win1[0]/num1[0]
-
+                    print(win1[0]/num1[0])
+                    print(rate1)
                     cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s'"%(team2id,mapid))
                     num2 = cursor.fetchone()
                     cursor.execute("SELECT COUNT(*) FROM roster_stats where roster_id in (  SELECT roster_id FROM rosters WHERE team_id='%s') AND map_id = '%s' AND won_this_map=1"%(team2id,mapid))
                     win2 = cursor.fetchone()
                     rate2 = win2[0]/num2[0]
+                    print(rate2)
                     if rate1 == 0 or rate2 == 0:
                         flash('Due to our limit database records, we can\'t predict the two teams on this map', 'warning')
                     else:
