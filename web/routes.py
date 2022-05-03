@@ -306,9 +306,8 @@ def playerpred_calculation():
 
         return render_template("predplayer.html", form=form, maps=map_names, players=player_names)
 
-    print("Map map:" + map_name)
 
-    #######################################################################################
+    ########################################################################################
 
     p1query = "SELECT * FROM player_performance " \
               "LEFT JOIN players ON players.player_id = player_performance.player_id " \
